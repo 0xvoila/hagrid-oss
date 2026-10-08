@@ -1,0 +1,49 @@
+
+services:
+
+  prometheus:
+    image: prom/prometheus
+    container_name: prometheus
+    ports:
+      - 9090:9090
+    volumes:
+      - prometheus_data:/prometheus
+    configs:
+      - source: prometheus_config
+        target: /etc/prometheus/prometheus.yml
+
+
+  grafana:
+    image: grafana/grafana
+    ports:
+      - 9091:3000
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=amit
+    volumes:
+      - grafana_data:/var/lib/grafana
+
+
+  django:
+    image: 0xvoila/hagrid-third-party-setup:latest
+    container_name: hagrid-thirdparty-dango
+    command: python manage.py runserver 0.0.0.0:3000
+    ports:
+      - 3000:3000
+
+
+volumes:
+  grafana_data:
+  prometheus_data:
+
+
+
+configs:
+  prometheus_config:
+    content: |
+      global:
+        scrape_interval: 15s
+      scrape_configs:
+        - job_name: 'prometheus'
+          metrics_path: '/actuator/prometheus'
+          static_configs:
+            - targets: ['host.docker.internal:8080']

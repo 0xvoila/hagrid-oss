@@ -1,0 +1,71 @@
+---
+configuration:
+  connector:
+    step_path: "com.freshworks.hagrid.data.three_six_zero.unit.fb.steps"
+    bean_path: "com.freshworks.hagrid.data.three_six_zero.unit.fb.beans"
+    asset_path: "com.freshworks.hagrid.data.three_six_zero.unit.fb.assets"
+
+  core:
+    publisher:
+      # default is NOP Persistent which does nothing
+      #    driver: "com.freshworks.hagridpublisher.Noop"
+      driver: "com.freshworks.hagridpublisher.MongoDb"
+      thread_count: 100
+      poll_count: 1000
+
+    # Keep traverser thread count as 1.
+    processor:
+      poll_count: 1000
+      number_of_parallel_processor : 20
+
+    traverser:
+      thread_count: 1
+      type: "http"
+
+    join:
+      inner_join:
+        driver: "com.freshworks.hagridprocessor.joins.InnerJoinService"
+
+      left_join:
+        driver: "com.freshworks.hagridprocessor.joins.LeftJoinService"
+
+      noop_join:
+        driver: "com.freshworks.hagridprocessor.joins.NoopJoinService"
+
+
+    infra:
+      infra_type: "persistent"
+      environment: "development"
+      persistent:
+        development:
+          database:
+            host: "mongodb"
+            port: "27017"
+            username: "admin"
+            password: "password12345"
+            authDb: "admin"
+
+        staging:
+          database:
+            host: "mongodb"
+            port: "27017"
+            username: "admin"
+            password: "password12345"
+            authDb: "admin"
+
+        production:
+          database:
+            host: "mongodb"
+            port: "27017"
+            username: "admin"
+            password: "password12345"
+            authDb: "admin"
+
+
+      infra: "com.freshworks.hagridshared.MongoDb.infra.MongoDbInfraService"
+      queue_driver: "com.freshworks.hagridinfra.MongoDb.MongodbQueue"
+      list_driver: "com.freshworks.hagridinfra.MongoDb.MongodbList"
+      key_value_driver: "com.freshworks.hagridinfra.MongoDb.MongodbKeyValue"
+
+    generation:
+      strategy: "asap" # As of now, we support just asap strategy. There is no what-complete
